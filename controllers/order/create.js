@@ -3,7 +3,7 @@ const product = require("../../models/product");
 
 exports.createOrder = async (req, res, next) => {
   try {
-    const { items } = req.body;
+    const { items,shippingAddress } = req.body;
     if (!Array.isArray(items) || items.length === 0)
       return res.status(400).json({ message: 'No items' });
 
@@ -19,7 +19,7 @@ exports.createOrder = async (req, res, next) => {
 
     // decrement stock
     for (const it of items) {
-      await product``.findByIdAndUpdate(it.product, { $inc: { stock: -it.quantity } });
+      await product.findByIdAndUpdate(it.product, { $inc: { stock: -it.quantity } });
     }
 
     const order = await Order.create({

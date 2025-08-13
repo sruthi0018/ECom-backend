@@ -12,13 +12,14 @@ exports.getProducts = async (req, res, next) => {
 
      if (catId) {
       const idsArray = catId.split(',');
-      query.catId = { $in: idsArray };
+      query.category = { $in: idsArray };
     }
 
 
     const total = await product.countDocuments(query);
    const products = await product.find(query)
       .populate("category", "name") 
+      .skip((page - 1) * parseInt(limit))
       .limit(parseInt(limit));
 
     res.json({ products, total });
