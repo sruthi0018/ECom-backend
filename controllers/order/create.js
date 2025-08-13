@@ -1,28 +1,46 @@
 const Order = require("../../models/order");
 const product = require("../../models/product");
 
-
 exports.createOrder = async (req, res, next) => {
   try {
     const { items } = req.body;
-    if (!items || !items.length) return res.status(400).json({ message: 'No items' });
+    if (!Array.isArray(items) || items.length === 0)
+      return res.status(400).json({ message: 'No items' });
 
+    // validate stock + compute total
     let total = 0;
-    const built = [];
     for (const it of items) {
-      const p = await product.findById(it.productId);
-      if (!p) return res.status(404).json({ message: 'Product not found' });
-      if (p.stock < it.quantity) return res.status(400).json({ message: `Insufficient stock ${p.title}`});
-      built.push({ product: p._id, name: p.title, price: p.price, quantity: it.quantity });
-      total += p.price * it.quantity;
+      const p = await product.findById(it.product);
+      if (!p) return res.status(400).json({ message: `Invalid product ${it.product}` });
+      if (p.stock < it.quantity)
+        return res.status(400).json({ message: `Insufficient stock for ${p.title}` });
+      total += (it.price ?? p.price) * it.quantity;
     }
 
+    // decrement stock
     for (const it of items) {
-      await product.findByIdAndUpdate(it.productId, { $inc: { stock: -it.quantity } });
+      await product``.findByIdAndUpdate(it.product, { $inc: { stock: -it.quantity } });
     }
 
-    const order = await Order.create({ user: req.user._id, items: built, totalPrice: total });
-    if (req.app && req.app.locals.io) req.app.locals.io.emit('newOrder', order);
+    const order = await Order.create({
+      user: req.user._id,
+      items,
+      totalPrice: total,
+      shippingAddress,
+      status: 'placed'
+    });
+
+    // real-time: notify new order and stock changes
+    req.io?.emit('order:new', { orderId: order._id, userId: req.user._id });
+    // low stock notifications
+    for (const it of items) {
+      const p = await product.findById(it.product);
+      req.io?.emit('stock:change', { productId: p._id, stock: p.stock });
+      if (p.stock <= 5) {
+        req.io?.emit('stock:low', { productId: p._id, stock: p.stock });
+      }
+    }
+
     res.status(201).json(order);
-  } catch (err) { next(err); }
+  } catch (e) { next(e); }
 };

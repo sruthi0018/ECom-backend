@@ -2,7 +2,7 @@ const User = require("../../models/user");
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-exports.login = async (req, res) => {
+exports.login = async (req, res,next) => {
   try {
     const { email, password } = req.body;
 
@@ -18,7 +18,5 @@ exports.login = async (req, res) => {
       token,
       user: { id: user._id, name: user.name, email: user.email, role:user.role }
     });
-  } catch (err) {
-    res.status(500).json({ message: 'Server error' });
-  }
+  } catch (e) { next(e); }
 };

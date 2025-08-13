@@ -1,7 +1,7 @@
 const product = require("../../models/product");
 
 
-exports.getProducts = async (req, res) => {
+exports.getProducts = async (req, res, next) => {
   try {
     const { search,catId, page = 1, limit = 10 } = req.query;
     const query = {};
@@ -22,7 +22,5 @@ exports.getProducts = async (req, res) => {
       .limit(parseInt(limit));
 
     res.json({ products, total });
-  } catch (err) {
-    res.status(500).json({ message: "Error fetching products", error: err.message });
-  }
+  }catch (e) { next(e); }
 };

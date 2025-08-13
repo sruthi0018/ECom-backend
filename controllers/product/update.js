@@ -1,6 +1,6 @@
 const Product = require("../../models/product");
 
-exports.updateProduct = async (req, res) => {
+exports.updateProduct = async (req, res,next) => {
   try {
     const { id } = req.params;
     const updates = req.body;
@@ -10,8 +10,9 @@ exports.updateProduct = async (req, res) => {
       updates.images = req.files.map(file => `/uploads/products/${file.filename}`);
     }
     const product = await Product.findByIdAndUpdate(id, updates, { new: true });
+    if (!p) return res.status(404).json({ message: 'Product not found' });
+
+    req.io?.emit('stock:change', { productId: p._id, stock: p.stock });
     res.json({ message: 'Product updated', product });
-  } catch (error) {
-    res.status(500).json({ message: 'Error updating product' });
-  }
+  } catch (e) { next(e); }
 };

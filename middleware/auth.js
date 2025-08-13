@@ -3,6 +3,8 @@ const jwt = require('jsonwebtoken');
 function auth(req, res, next) {
   const authHeader = req.headers.authorization;
 
+  console.log(authHeader,"authh")
+
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return res.status(401).json({ message: "Unauthorized" });
   }
@@ -11,6 +13,7 @@ function auth(req, res, next) {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log(decoded,"dec")
     req.user = { _id: decoded.userId, role: decoded.role };
     next();
   } catch (err) {

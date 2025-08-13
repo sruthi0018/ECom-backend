@@ -2,7 +2,7 @@ const User = require("../../models/user");
 const bcrypt = require('bcryptjs');
 
 
-exports.register = async (req, res) => {
+exports.register = async (req, res,next) => {
   try {
     const { name, email, password } = req.body;
 
@@ -15,7 +15,5 @@ exports.register = async (req, res) => {
     await user.save();
 
     res.status(201).json({ message: 'User registered successfully' });
-  } catch (err) {
-    res.status(500).json({ message: 'Server error' });
-  }
+  }  catch (e) { next(e); }
 };

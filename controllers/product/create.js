@@ -1,6 +1,6 @@
 const Product = require("../../models/product");
 
-exports.createProduct = async (req, res) => {
+exports.createProduct = async (req, res,next) => {
   try {
     const data = req.body;
 
@@ -17,20 +17,21 @@ exports.createProduct = async (req, res) => {
       );
     }
 
-    const product = new Product(data);
-    await product.save();
-
+ const product = await Product.create({
+      title: data.title,
+      description: data.description,
+      price: data.price,
+      category: data.category, 
+      images: data.images || [],
+      stock: data.stock ?? 0
+    });
+    // emit stock change
+    req.io?.emit('stock:change', { productId: product._id, stock: product.stock });
     console.log("Created Product:", product);
 
     res.status(201).json({
       message: "Product created successfully",
       product,
     });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      message: "Failed to create product",
-      error: error.message,
-    });
-  }
+  } catch (e) { next(e); }
 };

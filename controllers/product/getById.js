@@ -1,7 +1,7 @@
 
 const Product = require('../../models/product');
 
-exports.getProductById = async (req, res) => {
+exports.getProductById = async (req, res,next) => {
   try {
     const { id } = req.params;
 
@@ -13,8 +13,5 @@ exports.getProductById = async (req, res) => {
     }
 
     res.json(product);
-  } catch (error) {
-    console.error('Error fetching product by ID:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
+  }catch (e) { next(e); }
 };
