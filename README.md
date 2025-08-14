@@ -11,6 +11,9 @@ This is the backend API for the E-Commerce application built with **Node.js**, *
 - Role-based access control
 
 ---
+Live
+
+https://ecom-backend-j6d6.onrender.com
 
 ## 🚀 Getting Started
 
