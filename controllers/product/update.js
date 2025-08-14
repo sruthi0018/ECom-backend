@@ -14,7 +14,11 @@ exports.updateProduct = async (req, res, next) => {
 
     const updatedProduct = await Product.findByIdAndUpdate(id, updates, { new: true });
 
-    req.io?.emit('stock:change', { productId: updatedProduct._id, stock: updatedProduct.stock });
+   req.io?.emit('stock:change', { 
+  productId: updatedProduct._id, 
+  title: updatedProduct.title,
+  stock: updatedProduct.stock 
+});
 
     res.json({ message: 'Product updated', product: updatedProduct });
   } catch (e) {

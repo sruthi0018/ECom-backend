@@ -35,7 +35,7 @@ exports.createOrder = async (req, res, next) => {
     // low stock notifications
     for (const it of items) {
       const p = await product.findById(it.product);
-      req.io?.emit('stock:change', { productId: p._id, stock: p.stock });
+      req.io?.emit('stock:change', { productId: p._id, stock: p.stock,title: p.title  });
       if (p.stock <= 5) {
         req.io?.emit('stock:low', { productId: p._id, stock: p.stock });
       }

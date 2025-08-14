@@ -11,6 +11,7 @@ const productRouter = require('./routes/product')
 const orderRouter  = require('./routes/order')
 const categoryRouter  = require('./routes/category');
 const cartRouter = require('./routes/cart')
+const dashboardRouter = require('./routes/dashboard')
 const errorHandler = require('./middleware/error');
 
 
@@ -38,6 +39,8 @@ app.use("/api/v1/product", productRouter);
 app.use("/api/v1/order",orderRouter)
 app.use("/api/v1/category",categoryRouter)
 app.use("/api/v1/cart",cartRouter)
+app.use("/api/v1/admin",dashboardRouter)
+
 
 
 app.use(errorHandler);

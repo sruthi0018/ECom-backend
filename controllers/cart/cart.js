@@ -109,4 +109,17 @@ exports.removeFromCart = async (req, res, next) => {
   }
 };
 
+exports.clearCart = async (req, res, next) => {
+  try {
+    let cart = await Cart.findOne({ user: req.user._id });
 
+    if (!cart) return res.status(200).json({ items: [] });
+
+    cart.items = [];
+    await cart.save();
+
+    res.status(200).json({ items: [] });
+  } catch (e) {
+    next(e);
+  }
+};
